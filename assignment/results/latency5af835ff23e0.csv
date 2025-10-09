@@ -1,0 +1,11 @@
+ClientID,pass,file,keyword,count,from_cache,server,latency_ms
+1,5af835ff23e0,shrek3,with,112,True,de90a1ee24e5,13.720186994760297
+1,5af835ff23e0,grail,Boom,4,False,de90a1ee24e5,10.466186999110505
+1,5af835ff23e0,shrek3,CHARMING,232,False,de90a1ee24e5,14.253501998609863
+1,5af835ff23e0,shrek,fair,2,False,de90a1ee24e5,9.644905003369786
+1,5af835ff23e0,shrek3,showing,1,False,de90a1ee24e5,18.269403008162044
+2,5af835ff23e0,shrek3,with,112,True,2bf0d7df88f0,11.386639002012089
+2,5af835ff23e0,grail,Boom,4,True,2bf0d7df88f0,3.3535459951963276
+2,5af835ff23e0,shrek3,CHARMING,232,True,2bf0d7df88f0,3.0297980119939893
+2,5af835ff23e0,shrek,fair,2,True,2bf0d7df88f0,2.739161005592905
+2,5af835ff23e0,shrek3,showing,1,True,2bf0d7df88f0,3.5226030013291165

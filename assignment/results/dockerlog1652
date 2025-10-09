@@ -1,0 +1,111 @@
+client-5  | e5f18e579129: pass1: file=shrek  kw=GUARD    count=   25 cache=False server=2bf0d7df88f0 latency=39.33ms
+client-5  | e5f18e579129: pass1: file=shrek  kw=No.      count=    0 cache=True server=2bf0d7df88f0 latency=2.83ms
+client-5  | e5f18e579129: pass1: file=shrek  kw=What     count=  104 cache=False server=2bf0d7df88f0 latency=9.49ms
+client-5  | e5f18e579129: pass1: file=shrek  kw=And      count=  318 cache=True server=2bf0d7df88f0 latency=3.09ms
+client-5  | e5f18e579129: pass1: file=shrek3 kw=me!      count=    0 cache=True server=2bf0d7df88f0 latency=3.27ms
+client-5  | e5f18e579129: pass2: file=shrek  kw=GUARD    count=   25 cache=True server=2bf0d7df88f0 latency=7.15ms
+client-5  | e5f18e579129: pass2: file=shrek  kw=No.      count=    0 cache=True server=2bf0d7df88f0 latency=2.94ms
+client-5  | e5f18e579129: pass2: file=shrek  kw=What     count=  104 cache=True server=2bf0d7df88f0 latency=2.56ms
+client-5  | e5f18e579129: pass2: file=shrek  kw=And      count=  318 cache=True server=2bf0d7df88f0 latency=2.47ms
+client-5  | e5f18e579129: pass2: file=shrek3 kw=me!      count=    0 cache=True server=2bf0d7df88f0 latency=2.83ms
+client-1  | 5af835ff23e0: pass1: file=shrek3 kw=with     count=  112 cache=True server=de90a1ee24e5 latency=13.72ms
+client-5 exited with code 0
+client-1  | 5af835ff23e0: pass1: file=grail  kw=Boom     count=    4 cache=False server=de90a1ee24e5 latency=10.47ms
+client-1  | 5af835ff23e0: pass1: file=shrek3 kw=CHARMING count=  232 cache=False server=de90a1ee24e5 latency=14.25ms
+client-1  | 5af835ff23e0: pass1: file=shrek  kw=fair     count=    2 cache=False server=de90a1ee24e5 latency=9.64ms
+client-1  | 5af835ff23e0: pass1: file=shrek3 kw=showing  count=    1 cache=False server=de90a1ee24e5 latency=18.27ms
+client-1  | 5af835ff23e0: pass2: file=shrek3 kw=with     count=  112 cache=True server=2bf0d7df88f0 latency=11.39ms
+client-1  | 5af835ff23e0: pass2: file=grail  kw=Boom     count=    4 cache=True server=2bf0d7df88f0 latency=3.35ms
+client-1  | 5af835ff23e0: pass2: file=shrek3 kw=CHARMING count=  232 cache=True server=2bf0d7df88f0 latency=3.03ms
+client-1  | 5af835ff23e0: pass2: file=shrek  kw=fair     count=    2 cache=True server=2bf0d7df88f0 latency=2.74ms
+client-1  | 5af835ff23e0: pass2: file=shrek3 kw=showing  count=    1 cache=True server=2bf0d7df88f0 latency=3.52ms
+client-1 exited with code 0
+client-10  | 72b220d3f015: pass1: file=shrek  kw=swamp    count=   18 cache=False server=de90a1ee24e5 latency=16.93ms
+client-10  | 72b220d3f015: pass1: file=shrek  kw=cottage. count=    0 cache=False server=de90a1ee24e5 latency=11.11ms
+client-10  | 72b220d3f015: pass1: file=shrek3 kw=OGRE     count=   39 cache=False server=de90a1ee24e5 latency=13.98ms
+client-10  | 72b220d3f015: pass1: file=grail  kw=to       count=  718 cache=True server=de90a1ee24e5 latency=3.44ms
+client-10  | 72b220d3f015: pass1: file=grail  kw=54       count=    2 cache=False server=de90a1ee24e5 latency=12.44ms
+client-10  | 72b220d3f015: pass2: file=shrek  kw=swamp    count=   18 cache=True server=2bf0d7df88f0 latency=7.36ms
+client-10  | 72b220d3f015: pass2: file=shrek  kw=cottage. count=    0 cache=True server=2bf0d7df88f0 latency=2.85ms
+client-10  | 72b220d3f015: pass2: file=shrek3 kw=OGRE     count=   39 cache=True server=2bf0d7df88f0 latency=2.81ms
+client-10  | 72b220d3f015: pass2: file=grail  kw=to       count=  718 cache=True server=2bf0d7df88f0 latency=2.76ms
+client-10  | 72b220d3f015: pass2: file=grail  kw=54       count=    2 cache=True server=2bf0d7df88f0 latency=2.46ms
+client-10 exited with code 0
+client-3   | 777f79301b8c: pass1: file=shrek  kw=DONKEY   count=  320 cache=True server=de90a1ee24e5 latency=7.42ms
+client-3   | 777f79301b8c: pass1: file=shrek3 kw=OGRE     count=   39 cache=True server=de90a1ee24e5 latency=3.04ms
+client-3   | 777f79301b8c: pass1: file=grail  kw=19.—Prince count=    2 cache=False server=de90a1ee24e5 latency=10.91ms
+client-3   | 777f79301b8c: pass1: file=shrek  kw=(standing count=    0 cache=False server=de90a1ee24e5 latency=10.44ms
+client-3   | 777f79301b8c: pass1: file=grail  kw=LTD/     count=    0 cache=False server=de90a1ee24e5 latency=11.66ms
+client-3   | 777f79301b8c: pass2: file=shrek  kw=DONKEY   count=  320 cache=True server=2bf0d7df88f0 latency=5.57ms
+client-3   | 777f79301b8c: pass2: file=shrek3 kw=OGRE     count=   39 cache=True server=2bf0d7df88f0 latency=1.96ms
+client-3   | 777f79301b8c: pass2: file=grail  kw=19.—Prince count=    2 cache=True server=2bf0d7df88f0 latency=2.11ms
+client-3   | 777f79301b8c: pass2: file=shrek  kw=(standing count=    0 cache=True server=2bf0d7df88f0 latency=2.26ms
+client-3   | 777f79301b8c: pass2: file=grail  kw=LTD/     count=    0 cache=True server=2bf0d7df88f0 latency=2.72ms
+client-9   | 0f96b466bf83: pass1: file=shrek  kw=it's     count=   55 cache=False server=de90a1ee24e5 latency=13.23ms
+client-9   | 0f96b466bf83: pass1: file=grail  kw=seek     count=   12 cache=True server=de90a1ee24e5 latency=2.24ms
+
+
+client-3 exited with code 0
+client-9   | 0f96b466bf83: pass1: file=shrek  kw=DONKEY   count=  320 cache=True server=de90a1ee24e5 latency=2.32ms
+client-9   | 0f96b466bf83: pass1: file=shrek  kw=DONKEY   count=  320 cache=True server=de90a1ee24e5 latency=2.75ms
+client-9   | 0f96b466bf83: pass2: file=shrek  kw=it's     count=   55 cache=True server=2bf0d7df88f0 latency=5.96ms
+client-9   | 0f96b466bf83: pass2: file=grail  kw=seek     count=   12 cache=True server=2bf0d7df88f0 latency=2.45ms
+client-9   | 0f96b466bf83: pass2: file=shrek  kw=(standing count=    0 cache=True server=2bf0d7df88f0 latency=2.35ms
+client-9   | 0f96b466bf83: pass2: file=shrek  kw=DONKEY   count=  320 cache=True server=2bf0d7df88f0 latency=2.67ms
+client-9   | 0f96b466bf83: pass2: file=shrek  kw=DONKEY   count=  320 cache=True server=2bf0d7df88f0 latency=2.32ms
+client-9 exited with code 0
+client-4   | 5047ea5e97b3: pass1: file=grail  kw=thus     count=    5 cache=True server=de90a1ee24e5 latency=6.42ms
+client-4   | 5047ea5e97b3: pass1: file=grail  kw=Eolio,   count=    0 cache=False server=de90a1ee24e5 latency=8.62ms
+client-4   | 5047ea5e97b3: pass1: file=grail  kw=Bum      count=   13 cache=False server=de90a1ee24e5 latency=8.61ms
+client-4   | 5047ea5e97b3: pass1: file=grail  kw=Jones/Chapman/Palin count=    1 cache=False server=de90a1ee24e5 latency=8.33ms
+client-4   | 5047ea5e97b3: pass1: file=shrek3 kw=Artie    count=  213 cache=False server=de90a1ee24e5 latency=12.80ms
+client-4   | 5047ea5e97b3: pass2: file=grail  kw=thus     count=    5 cache=True server=2bf0d7df88f0 latency=7.48ms
+client-4   | 5047ea5e97b3: pass2: file=grail  kw=Eolio,   count=    0 cache=True server=2bf0d7df88f0 latency=2.83ms
+client-4   | 5047ea5e97b3: pass2: file=grail  kw=Bum      count=   13 cache=True server=2bf0d7df88f0 latency=2.31ms
+client-4   | 5047ea5e97b3: pass2: file=grail  kw=Jones/Chapman/Palin count=    1 cache=True server=2bf0d7df88f0 latency=2.21ms
+client-4   | 5047ea5e97b3: pass2: file=shrek3 kw=Artie    count=  213 cache=True server=2bf0d7df88f0 latency=2.18ms
+client-4 exited with code 0
+client-6   | ce384285d602: pass1: file=shrek  kw=old      count=   10 cache=False server=de90a1ee24e5 latency=11.38ms
+client-6   | ce384285d602: pass1: file=grail  kw=lute],   count=    0 cache=False server=de90a1ee24e5 latency=7.93ms
+client-6   | ce384285d602: pass1: file=grail  kw=pseudonym count=    1 cache=True server=de90a1ee24e5 latency=2.43ms
+client-6   | ce384285d602: pass1: file=shrek3 kw=WHITE    count=   45 cache=True server=de90a1ee24e5 latency=2.89ms
+client-6   | ce384285d602: pass1: file=shrek3 kw=116.     count=    0 cache=False server=de90a1ee24e5 latency=12.83ms
+client-6   | ce384285d602: pass2: file=shrek  kw=old      count=   10 cache=True server=2bf0d7df88f0 latency=6.66ms
+client-6   | ce384285d602: pass2: file=grail  kw=lute],   count=    0 cache=True server=2bf0d7df88f0 latency=2.38ms
+client-6   | ce384285d602: pass2: file=grail  kw=pseudonym count=    1 cache=True server=2bf0d7df88f0 latency=2.28ms
+client-6   | ce384285d602: pass2: file=shrek3 kw=WHITE    count=   45 cache=True server=2bf0d7df88f0 latency=2.19ms
+client-6   | ce384285d602: pass2: file=shrek3 kw=116.     count=    0 cache=True server=2bf0d7df88f0 latency=3.22ms
+client-6 exited with code 0
+client-8   | b7384c83e55e: pass1: file=grail  kw=ANOTHER  count=   25 cache=True server=de90a1ee24e5 latency=6.28ms
+client-8   | b7384c83e55e: pass1: file=shrek  kw=tell     count=   25 cache=False server=de90a1ee24e5 latency=7.71ms
+client-8   | b7384c83e55e: pass1: file=shrek  kw=(whistles) count=    0 cache=False server=de90a1ee24e5 latency=7.84ms
+client-8   | b7384c83e55e: pass1: file=shrek3 kw=SNOW     count=   49 cache=False server=de90a1ee24e5 latency=13.60ms
+client-8   | b7384c83e55e: pass1: file=grail  kw=few      count=    8 cache=False server=de90a1ee24e5 latency=9.95ms
+client-8   | b7384c83e55e: pass2: file=grail  kw=ANOTHER  count=   25 cache=True server=2bf0d7df88f0 latency=7.45ms
+client-8   | b7384c83e55e: pass2: file=shrek  kw=tell     count=   25 cache=True server=2bf0d7df88f0 latency=2.87ms
+client-8   | b7384c83e55e: pass2: file=shrek  kw=(whistles) count=    0 cache=True server=2bf0d7df88f0 latency=2.20ms
+client-8   | b7384c83e55e: pass2: file=shrek3 kw=SNOW     count=   49 cache=True server=2bf0d7df88f0 latency=2.33ms
+client-8   | b7384c83e55e: pass2: file=grail  kw=few      count=    8 cache=True server=2bf0d7df88f0 latency=2.54ms
+client-8 exited with code 0
+client-2   | f5bfc51ddb3c: pass1: file=shrek  kw=he       count=  118 cache=False server=de90a1ee24e5 latency=12.52ms
+client-2   | f5bfc51ddb3c: pass1: file=shrek3 kw=SHOUTING) count=    0 cache=False server=de90a1ee24e5 latency=8.87ms
+client-2   | f5bfc51ddb3c: pass1: file=grail  kw=witch!   count=    0 cache=False server=de90a1ee24e5 latency=9.41ms
+client-2   | f5bfc51ddb3c: pass1: file=grail  kw=LANCELOT count=   59 cache=True server=de90a1ee24e5 latency=2.92ms
+client-2   | f5bfc51ddb3c: pass1: file=shrek  kw=DONKEY   count=  320 cache=True server=de90a1ee24e5 latency=2.47ms
+client-2   | f5bfc51ddb3c: pass2: file=shrek  kw=he       count=  118 cache=True server=2bf0d7df88f0 latency=5.29ms
+client-2   | f5bfc51ddb3c: pass2: file=shrek3 kw=SHOUTING) count=    0 cache=True server=2bf0d7df88f0 latency=2.51ms
+client-2   | f5bfc51ddb3c: pass2: file=grail  kw=witch!   count=    0 cache=True server=2bf0d7df88f0 latency=2.28ms
+client-2   | f5bfc51ddb3c: pass2: file=grail  kw=LANCELOT count=   59 cache=True server=2bf0d7df88f0 latency=2.51ms
+client-2   | f5bfc51ddb3c: pass2: file=shrek  kw=DONKEY   count=  320 cache=True server=2bf0d7df88f0 latency=3.01ms
+client-2 exited with code 0
+client-7   | f17993949d12: pass1: file=grail  kw=on       count=  139 cache=True server=de90a1ee24e5 latency=6.23ms
+client-7   | f17993949d12: pass1: file=grail  kw=upon     count=   13 cache=False server=de90a1ee24e5 latency=7.24ms
+client-7   | f17993949d12: pass1: file=shrek3 kw=meet."   count=    0 cache=True server=de90a1ee24e5 latency=2.53ms
+client-7   | f17993949d12: pass1: file=grail  kw=BEDEVERE: count=    0 cache=False server=de90a1ee24e5 latency=8.25ms
+client-7   | f17993949d12: pass1: file=shrek3 kw=right.   count=    0 cache=True server=de90a1ee24e5 latency=2.09ms
+client-7   | f17993949d12: pass2: file=grail  kw=on       count=  139 cache=True server=2bf0d7df88f0 latency=6.11ms
+client-7   | f17993949d12: pass2: file=grail  kw=upon     count=   13 cache=True server=2bf0d7df88f0 latency=2.28ms
+client-7   | f17993949d12: pass2: file=shrek3 kw=meet."   count=    0 cache=True server=2bf0d7df88f0 latency=3.42ms
+client-7   | f17993949d12: pass2: file=grail  kw=BEDEVERE: count=    0 cache=True server=2bf0d7df88f0 latency=2.46ms
+client-7   | f17993949d12: pass2: file=shrek3 kw=right.   count=    0 cache=True server=2bf0d7df88f0 latency=1.83ms
+client-7 exited with code 0
