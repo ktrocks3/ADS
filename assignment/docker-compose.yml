@@ -22,12 +22,12 @@ services:
     <<: *srv
 
   lb:
-    build: ./server
+    build: ./lb
     depends_on: [server1, server2, server3]
     environment:
       - ALGO=rr
       - LB_PORT=9000
-    command: ["python", "load_balancer.py"]
+    command: ["python", "load_balancer_FD.py"]
     ports:
       - "9000:9000"
     restart: unless-stopped

@@ -8,6 +8,7 @@ START_JITTER = 10
 time.sleep(random.random() * START_JITTER)
 CONNECT_EACH = True
 TWO_PASSES   = False
+INFINITE_REQUESTS = True
 
 # Load random tests
 with open("word_list") as f:
@@ -58,10 +59,29 @@ def run_batch(passno: int):
             conn.close()
     return rows
 
+def infinite_requests():
+    while True:
+        time.sleep(3)
+        (fname, kw) = ast.literal_eval(random.choice(options).strip())
+        conn = rpyc.connect(host, port)
+        try:
+            t0 = time.perf_counter()
+            resp = conn.root.count(fname, kw)
+            dt_ms = (time.perf_counter() - t0) * 1000.0
+            print(
+                f"client={CLIENT_ID}, file={fname:6s} kw={kw:8s} count={resp['count']:5d} "
+                f"cache={resp['from_cache']} server={resp['server']}, latency={dt_ms:.2f}ms",
+                flush=True
+            )
+        finally:
+            conn.close()
 
-all_rows = run_batch(1)
-if TWO_PASSES:
-    all_rows += run_batch(2)
+if INFINITE_REQUESTS:
+    infinite_requests()
+else:
+    all_rows = run_batch(1)
+    if TWO_PASSES:
+        all_rows += run_batch(2)
 
 # Write one CSV per client container
 if os.getenv("SAVE_CSV", "1") == "1":
