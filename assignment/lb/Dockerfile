@@ -1,11 +1,8 @@
 FROM python:3.10-slim
 
 WORKDIR /app
-COPY load_balancer_FD.py .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt || true
+COPY load_balancer_FD.py load_balancer_gui.py run_lb.sh ./
 
-# no external libs needed, but if you do:
-# COPY requirements.txt .
-# RUN pip install -r requirements.txt
-
-EXPOSE 9000
-CMD ["python", "load_balancer_FD.py"]
+CMD ["./run_lb.sh"]

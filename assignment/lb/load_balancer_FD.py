@@ -16,8 +16,7 @@ HC_RISE = int(os.getenv("HC_RISE", "2"))
 
 ALGO = os.getenv("ALGO", "rr").lower()  # 'rr' or 'lc'
 LISTEN_PORT = int(os.getenv("LB_PORT", "9000"))
-HEALTH_INTERVAL = 1.5
-HEALTH_TIMEOUT = 0.75
+EXTRA_INFO = bool(int(os.getenv("EXTRA_INFO", "0")))
 
 
 
@@ -40,18 +39,20 @@ class Pool:
         except Exception:
             return False
 
-        
     def pick(self):
-        if ALGO == "lc":
-            return min([self.conns[i] for i in range(len(self.backends)) if health[self.backends[i][0]]])
+        healthy_idxs = [i for i, (h, _) in enumerate(self.backends) if health[h]]
+        if not healthy_idxs:
+            return None
 
-        chosen = next(self._rr)
-        chosen_init = chosen
-        while not health[self.backends[chosen][0]]:
-            if chosen_init == chosen:
-                break
-            chosen = next(self._rr)
-        return chosen
+        if ALGO == "lc":
+            return min(healthy_idxs, key=lambda i: self.conns[i])
+
+        # round-robin over healthy
+        for _ in range(len(self.backends)):
+            idx = next(self._rr)
+            if health[self.backends[idx][0]]:
+                return idx
+        return None
 
 
 pool = Pool(BACKENDS)
@@ -72,22 +73,28 @@ async def health_loop():
                     fails[h] = 0
                     if not health[h] and passes[h] >= HC_RISE:
                         health[h] = True
+                        print(f"{h} is back online")
                 except Exception:
                     fails[h] += 1
                     passes[h] = 0
                     if health[h] and fails[h] >= HC_FALL:
                         health[h] = False
+                        print(f"{h} is offline")
             checks.append(asyncio.create_task(probe()))
         # let all probes finish; then sleep
         with contextlib.suppress(Exception):
             await asyncio.gather(*checks)
         await asyncio.sleep(HC_INTERVAL)
-        
+
 async def proxy_client(reader, writer):
     tried = set()
     while True:
+        if EXTRA_INFO:
+            print(f"[LB] New connection from client {writer.get_extra_info('peername')}")
         idx = pool.pick()
         host, port = pool.backends[idx]
+        if EXTRA_INFO:
+            print(f"[LB] Connecting client -> {host}:{port}")
 
         if idx is None or idx in tried:
             with contextlib.suppress(Exception):
@@ -102,6 +109,8 @@ async def proxy_client(reader, writer):
             continue
         try:
             backend_reader, backend_writer = await asyncio.open_connection(host, port)
+            if EXTRA_INFO:
+                print(f"[LB] Connection established: {host}:{port}")
             pool.conns[idx] += 1
 
             async def pump(src, dst):
@@ -117,6 +126,8 @@ async def proxy_client(reader, writer):
                         dst.close()
 
             await asyncio.gather(pump(reader, backend_writer), pump(backend_reader, writer))
+            break
+
         except Exception:
             continue
         finally:

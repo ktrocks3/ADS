@@ -27,10 +27,26 @@ services:
     environment:
       - ALGO=rr
       - LB_PORT=9000
-    command: ["python", "load_balancer_FD.py"]
+      - EXTRA_INFO=0
+      - ENABLE_GUI=1
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
     ports:
       - "9000:9000"
     restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    depends_on: [redis, lb]
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    ports:
+      - "8080:8080"
+    restart: "no"
+    profiles: ["gui"]
 
   client:
     build: ./client
@@ -40,6 +56,8 @@ services:
       - RPYC_PORT=9000
       - TWO_PASSES=1
       - SAVE_CSV=1
+      - TIME_BETWEEN=5
+      - INF_PASS=1
     volumes:
       - ./results:/results
     command: ["python", "client.py"]

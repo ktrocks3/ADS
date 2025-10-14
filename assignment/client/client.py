@@ -7,18 +7,25 @@ print(f"{CLIENT_ID} has started")
 START_JITTER = 10
 time.sleep(random.random() * START_JITTER)
 CONNECT_EACH = True
-TWO_PASSES   = False
-INFINITE_REQUESTS = True
+TWO_PASSES = False
+INFINITE_REQUESTS = bool(int(os.getenv("INF_PASS", "0")))
+TIME_BETWEEN = float(os.getenv("TIME_BETWEEN", "3"))
 
 # Load random tests
 with open("word_list") as f:
     options = f.readlines()
 tests = [ast.literal_eval(random.choice(options).strip()) for _ in range(5)]
 
+
+def sleep_with_jitter():
+    jitter = (random.random() - 0.5) * (TIME_BETWEEN * 0.2)
+    time.sleep(max(0.0, TIME_BETWEEN + jitter))
+
 def run_batch(passno: int):
     rows = []
     if CONNECT_EACH:
         for i, (fname, kw) in enumerate(tests, 1):
+            sleep_with_jitter()
             conn = rpyc.connect(host, port)
             try:
                 t_start = datetime.datetime.utcnow().isoformat()
@@ -59,9 +66,10 @@ def run_batch(passno: int):
             conn.close()
     return rows
 
+
 def infinite_requests():
     while True:
-        time.sleep(3)
+        sleep_with_jitter()
         (fname, kw) = ast.literal_eval(random.choice(options).strip())
         conn = rpyc.connect(host, port)
         try:
@@ -76,6 +84,7 @@ def infinite_requests():
         finally:
             conn.close()
 
+
 if INFINITE_REQUESTS:
     infinite_requests()
 else:
@@ -84,12 +93,12 @@ else:
         all_rows += run_batch(2)
 
 # Write one CSV per client container
-if os.getenv("SAVE_CSV", "1") == "1":
+if os.getenv("SAVE_CSV", "1") == "1" and not INFINITE_REQUESTS:
     os.makedirs("/results", exist_ok=True)
     outfile = f"/results/latency-{CLIENT_ID}.csv"
     with open(outfile, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["pass","client_id","t_start_utc","file","keyword",
-                    "count","from_cache","server","latency_ms"])
+        w.writerow(["pass", "client_id", "t_start_utc", "file", "keyword",
+                    "count", "from_cache", "server", "latency_ms"])
         w.writerows(all_rows)
     print(f"wrote {outfile}", flush=True)
