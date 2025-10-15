@@ -2,10 +2,6 @@ version: "3.9"
 services:
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-    # Keep Redis data only in RAM; wiped on container stop/recreate
-    tmpfs:
-      - /data
     restart: unless-stopped
 
   server1: &srv
@@ -60,7 +56,7 @@ services:
       - RPYC_PORT=9000
       - TWO_PASSES=1
       - SAVE_CSV=1
-      - TIME_BETWEEN=0.5
+      - TIME_BETWEEN=0.1
       - INF_PASS=0
       - SAMPLE_SIZE=20
     volumes:
