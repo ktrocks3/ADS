@@ -7,14 +7,15 @@ print(f"{CLIENT_ID} has started")
 START_JITTER = 10
 time.sleep(random.random() * START_JITTER)
 CONNECT_EACH = True
-TWO_PASSES = False
+TWO_PASSES = bool(int(os.getenv("TWO_PASSES", "0")))
 INFINITE_REQUESTS = bool(int(os.getenv("INF_PASS", "0")))
 TIME_BETWEEN = float(os.getenv("TIME_BETWEEN", "3"))
+SAMPLE_SIZE = int(os.getenv("SAMPLE_SIZE", "5"))
 
 # Load random tests
 with open("word_list") as f:
     options = f.readlines()
-tests = [ast.literal_eval(random.choice(options).strip()) for _ in range(5)]
+tests = [ast.literal_eval(random.choice(options).strip()) for _ in range(SAMPLE_SIZE)]
 
 
 def sleep_with_jitter():

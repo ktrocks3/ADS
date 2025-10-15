@@ -2,6 +2,10 @@ version: "3.9"
 services:
   redis:
     image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    # Keep Redis data only in RAM; wiped on container stop/recreate
+    tmpfs:
+      - /data
     restart: unless-stopped
 
   server1: &srv
@@ -25,10 +29,10 @@ services:
     build: ./lb
     depends_on: [server1, server2, server3]
     environment:
-      - ALGO=rr
+      - ALGO=lc
       - LB_PORT=9000
       - EXTRA_INFO=0
-      - ENABLE_GUI=1
+      - ENABLE_GUI=0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
@@ -56,8 +60,9 @@ services:
       - RPYC_PORT=9000
       - TWO_PASSES=1
       - SAVE_CSV=1
-      - TIME_BETWEEN=5
-      - INF_PASS=1
+      - TIME_BETWEEN=0.5
+      - INF_PASS=0
+      - SAMPLE_SIZE=20
     volumes:
       - ./results:/results
     command: ["python", "client.py"]
