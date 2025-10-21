@@ -28,7 +28,6 @@ services:
       - ALGO=rr
       - LB_PORT=9000
       - EXTRA_INFO=0
-      - ENABLE_GUI=0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
@@ -36,31 +35,19 @@ services:
       - "9000:9000"
     restart: unless-stopped
 
-  dashboard:
-    build: ./dashboard
-    depends_on: [redis, lb]
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=0
-    ports:
-      - "8080:8080"
-    restart: "no"
-    profiles: ["gui"]
-
   client:
     build: ./client
-    depends_on: [server1]
+    depends_on: [lb]
     environment:
-      - SERVER_HOST=server1
-      - RPYC_PORT=18861
+      - SERVER_HOST=lb
+      - RPYC_PORT=9000
       - TWO_PASSES=1
-      - SAVE_CSV=1
-      - TIME_BETWEEN=0.1
+      - SAVE_CSV=0
+      - TIME_BETWEEN=3
       - INF_PASS=0
       - SAMPLE_SIZE=20
       - JITTER=0
     volumes:
       - ./results:/results
     command: ["python", "client.py"]
-    restart: "no"
+    restart: unless-stopped

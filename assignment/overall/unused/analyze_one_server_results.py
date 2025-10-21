@@ -98,37 +98,83 @@ def compute_basic_metrics(df: pd.DataFrame, tail_q: float = 0.95):
         f"miss_p{tail_key}_ms": mp[tail_key],
     }
 
-def plot_latency_series_five_keywords(df: pd.DataFrame, outdir: Path, title_suffix: str = ""):
+def plot_latency_series_per_request(
+    df: pd.DataFrame,
+    outdir: Path,
+    tail_q: float = 0.95,
+    title_suffix: str = "",
+    show_keywords: bool = False,
+):
     """
-    Create a line plot showing latency vs request index for at least five different keywords.
-    We pick the top-5 keywords by request count (in that dataset) and plot their series over time.
+    Per-request latency series for a single dataset (e.g., 1 client, 40 requests).
+    X: request index (1..N), Y: latency_ms.
+    Colors: cache hit (filled), cache miss (hollow).
+    Overlays mean, p95, p99 (tail).
     """
     if df.empty:
         return None
-    # choose top 5 keywords
-    topk = (df["keyword"].value_counts().head(5)).index.tolist()
-    sub = df[df["keyword"].isin(topk)].copy()
-    sub = sub.sort_values("t_start_utc").reset_index(drop=True)
 
-    # assign an "order" per keyword to position on x-axis
-    sub["req_idx"] = sub.groupby("keyword").cumcount() + 1
+    # Sort by the time we sent the request from the client
+    data = df.sort_values("t_start_utc").reset_index(drop=True).copy()
+    data["req_idx"] = np.arange(1, len(data) + 1)
 
-    # build plot
-    fig = plt.figure(figsize=(9, 5))
+    lat = data["latency_ms"].astype(float).dropna()
+    if lat.empty:
+        return None
+
+    # Tail stats
+    p = percentiles(lat, (0.5, tail_q, 0.99))
+    tail_key = int(tail_q * 100)
+    mean = float(lat.mean())
+    p50  = p[50]
+    p_tail = p[tail_key]
+    p99  = p[99]
+
+    # Plot
+    fig = plt.figure(figsize=(10, 5))
     ax = fig.add_subplot(111)
-    for kw in topk:
-        kk = sub[sub["keyword"] == kw]
-        if kk.empty:
-            continue
-        ax.plot(kk["req_idx"].values, kk["latency_ms"].values, marker="o", label=kw)
-    ax.set_title(f"Execution latency over requests (top-5 keywords){title_suffix}")
-    ax.set_xlabel("Request index per keyword")
-    ax.set_ylabel("Latency (ms)")
-    ax.legend()
+
+    # Split by cache segment for visual clarity
+    hit = data[data["from_cache"] == True]
+    miss = data[data["from_cache"] == False]
+
+    # Connect the points with a thin line (overall) to show temporal evolution
+    ax.plot(data["req_idx"], data["latency_ms"], linewidth=0.8, alpha=0.6, label="_nolegend_")
+
+    # Scatter markers: filled for hit, hollow for miss
+    if not hit.empty:
+        ax.scatter(hit["req_idx"], hit["latency_ms"], s=28, label="cache hit")
+    if not miss.empty:
+        ax.scatter(miss["req_idx"], miss["latency_ms"], s=28, facecolors="none", edgecolors="black", label="cache miss")
+
+    # Overlays (mean, tail, p99)
+    ax.axhline(mean, linestyle="--", linewidth=1.2, label=f"mean = {mean:.1f} ms")
+    ax.axhline(p_tail, linestyle="-.", linewidth=1.2, label=f"p{tail_key} = {p_tail:.1f} ms")
+    ax.axhline(p99, linestyle=":", linewidth=1.2, label=f"p99 = {p99:.1f} ms")
+
+    ax.set_title(f"Execution latency per request{title_suffix}")
+    ax.set_xlabel("Request number (1…N)")
+    ax.set_ylabel("Execution latency (ms)")
+    ax.legend(loc="best")
+    ax.grid(True, linestyle=":", linewidth=0.5, alpha=0.6)
     fig.tight_layout()
-    outfile = outdir / f"phase2_latency_series_top5{title_suffix.replace(' ', '_')}.png"
+
+    # Optional: show the keyword labels on a top twin axis (gets crowded with 40 labels)
+    if show_keywords:
+        ax_top = ax.twiny()
+        ax_top.set_xlim(ax.get_xlim())
+        ax_top.set_xticks(data["req_idx"])
+        ax_top.set_xticklabels(data["keyword"], rotation=90, fontsize=7)
+        ax_top.set_xlabel("Keyword (by request order)")
+
+    outfile = outdir / f"phase2_latency_series_per_request{title_suffix.replace(' ', '_')}.png"
     fig.savefig(outfile, dpi=150)
     plt.close(fig)
+
+    # Export the per-request table for easy screenshotting/evidence
+    cols = ["req_idx", "t_start_utc", "client_id", "keyword", "from_cache", "latency_ms", "file", "count", "pass", "server"]
+    data[cols].to_csv(outdir / f"phase2_latency_series_per_request{title_suffix.replace(' ', '_')}.csv", index=False)
+
     return outfile
 
 def plot_hit_vs_miss_box(df: pd.DataFrame, outdir: Path, title_suffix: str = ""):
@@ -174,64 +220,100 @@ def print_table(df: pd.DataFrame, title: str):
 
 def plot_combined_hit_miss_box(all_df: pd.DataFrame, outdir: Path):
     """
-    Create one combined boxplot with all 6 boxes:
-    (hit/miss) × (1C, 10C, 100C)
+    One figure with 9 boxes total:
+    (Hit, Miss, Combined) x (1C, 10C, 100C)
+    Ensures consistent coloring: Hit = blue, Miss = red, Combined = gray.
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
+
     if all_df.empty:
         return None
 
-    clients_all = sorted(all_df["clients"].unique())
-    hit_data, miss_data, labels = [], [], []
-
-    # Collect data
-    for c in clients_all:
-        sub = all_df[all_df["clients"] == c]
-        if sub.empty:
-            continue
-        hit = sub[sub["from_cache"] == True]["latency_ms"].dropna().values
-        miss = sub[sub["from_cache"] == False]["latency_ms"].dropna().values
-        hit_data.append(hit)
-        miss_data.append(miss)
-        labels.append(f"{c}C")
-
-    if not labels:
+    # Use a fixed client order; filter to what's present
+    desired = [1, 10, 100]
+    clients_all = [c for c in desired if c in set(all_df["clients"].unique())]
+    if not clients_all:
         return None
 
-    # Plot combined boxes
-    fig, ax = plt.subplots(figsize=(10, 5))
-    spacing = 2.0
-    width = 0.8
-    hit_pos = [i * spacing for i in range(len(labels))]
-    miss_pos = [i * spacing + 1.0 for i in range(len(labels))]
+    fig, ax = plt.subplots(figsize=(12, 5))
 
-    bp_hit = ax.boxplot(hit_data, positions=hit_pos, widths=width, showfliers=False, patch_artist=True)
-    bp_miss = ax.boxplot(miss_data, positions=miss_pos, widths=width, showfliers=False, patch_artist=True)
+    spacing = 3.0   # distance between client groups (3 boxes per group)
+    width = 0.8     # box width
 
-    # Style
-    for b in bp_hit["boxes"]:
-        b.set_facecolor("skyblue")
-    for b in bp_miss["boxes"]:
-        b.set_facecolor("lightcoral")
+    # Legend patches (don't rely on returned artists)
+    hit_patch = Patch(facecolor="blue",  label="Cache Hit")
+    miss_patch = Patch(facecolor="red",   label="Cache Miss")
+    comb_patch = Patch(facecolor="white",  label="Combined")
 
-    # Add medians thicker
-    for med in bp_hit["medians"]:
-        med.set_linewidth(1.5)
-    for med in bp_miss["medians"]:
-        med.set_linewidth(1.5)
+    for i, c in enumerate(clients_all):
+        sub = all_df[all_df["clients"] == c]
 
-    centers = [i * spacing + 0.5 for i in range(len(labels))]
+        # positions within this client group
+        base = i * spacing
+        pos_hit  = base + 0.0
+        pos_miss = base + 1.0
+        pos_comb = base + 2.0
+
+        # Extract data
+        hit_vals  = sub.loc[sub["from_cache"] == True,  "latency_ms"].dropna().values
+        miss_vals = sub.loc[sub["from_cache"] == False, "latency_ms"].dropna().values
+        # Combined = all rows for this client (regardless of from_cache)
+        comb_vals = sub["latency_ms"].dropna().values
+
+        # Plot HIT
+        if hit_vals.size > 0:
+            bp_hit = ax.boxplot([hit_vals],
+                                positions=[pos_hit],
+                                widths=width,
+                                showfliers=False,
+                                patch_artist=True)
+            for box in bp_hit["boxes"]:
+                box.set_facecolor("blue")
+            for med in bp_hit["medians"]:
+                med.set_linewidth(1.5)
+
+        # Plot MISS
+        if miss_vals.size > 0:
+            bp_miss = ax.boxplot([miss_vals],
+                                 positions=[pos_miss],
+                                 widths=width,
+                                 showfliers=False,
+                                 patch_artist=True)
+            for box in bp_miss["boxes"]:
+                box.set_facecolor("red")
+            for med in bp_miss["medians"]:
+                med.set_linewidth(1.5)
+
+        # Plot COMBINED
+        if comb_vals.size > 0:
+            bp_comb = ax.boxplot([comb_vals],
+                                 positions=[pos_comb],
+                                 widths=width,
+                                 showfliers=False,
+                                 patch_artist=True)
+            for box in bp_comb["boxes"]:
+                box.set_facecolor("white")
+            for med in bp_comb["medians"]:
+                med.set_linewidth(1.5)
+
+    # X-axis: center label under each 3-box cluster
+    centers = [i * spacing + 1.0 for i in range(len(clients_all))]
     ax.set_xticks(centers)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels([f"{c}C" for c in clients_all])
+
     ax.set_xlabel("Client count")
     ax.set_ylabel("Latency (ms)")
-    ax.set_title("Cache Hit vs Miss Latency across client scales (NoLB)")
-    ax.legend([bp_hit["boxes"][0], bp_miss["boxes"][0]], ["Cache Hit", "Cache Miss"], loc="best")
+    ax.set_title("Cache Hit vs Miss vs Combined Latency across client scales")
+    ax.legend(handles=[hit_patch, miss_patch, comb_patch], loc="best")
 
     fig.tight_layout()
-    outfile = outdir / "phase2_latency_box_all_clients.png"
+    outfile = Path(outdir) / "phase2_latency_box_all_clients_9boxes.png"
     fig.savefig(outfile, dpi=150)
     plt.close(fig)
     return outfile
+
 
 
 def main():
@@ -289,14 +371,17 @@ def main():
     # === Figures for the report ===
     # 1) Series plot for 1C (clear single-server view)
     df1 = all_df[all_df["clients"] == 1].copy()
-    s1 = plot_latency_series_five_keywords(df1, out_dir, title_suffix=" - 1 client")
+    # 2) Per-request latency series for 1 client (40 requests)
+    s1 = plot_latency_series_per_request(
+        df1, out_dir, tail_q=args.tail, title_suffix=" - 1 client", show_keywords=False
+    )
+
     # 3) Overall CDF for 1C
     c1 = plot_latency_cdf(df1, out_dir, title_suffix=" - 1 client")
 
     # Optional: also export the same trio for 10C and 100C (handy if you want to mention them in text)
     for c in [10, 100]:
         dfx = all_df[all_df["clients"] == c].copy()
-        plot_latency_series_five_keywords(dfx, out_dir, title_suffix=f" - {c} clients")
         plot_latency_cdf(dfx, out_dir, title_suffix=f" - {c} clients")
 
     # Combined boxplot for all client scales (6 boxes: hit/miss × 1C/10C/100C)
