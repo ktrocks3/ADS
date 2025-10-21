@@ -1,0 +1,4 @@
+key,algo,clients,requests,duration_s,throughput_req_s,lat_mean_ms,lat_median_ms,lat_p95_ms,lat_p99_ms,cache_hit_ratio,hit_mean_ms,hit_p50_ms,hit_p95_ms,miss_mean_ms,miss_p50_ms,miss_p95_ms
+NoLB-1C,NoLB,1,40,4.255,9.401,5.441,3.061,10.062,12.696,0.525,2.725,2.756,3.01,8.442,8.113,10.761
+NoLB-10C,NoLB,10,400,6.808,58.757,8.724,5.137,27.855,45.018,0.688,5.492,3.701,15.638,15.832,11.296,37.972
+NoLB-100C,NoLB,100,4000,42.138,94.927,5.672,4.183,13.557,25.06,0.973,5.421,4.103,12.447,14.711,12.683,29.451

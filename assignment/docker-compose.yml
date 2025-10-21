@@ -25,7 +25,7 @@ services:
     build: ./lb
     depends_on: [server1, server2, server3]
     environment:
-      - ALGO=lc
+      - ALGO=rr
       - LB_PORT=9000
       - EXTRA_INFO=0
       - ENABLE_GUI=0
@@ -50,15 +50,16 @@ services:
 
   client:
     build: ./client
-    depends_on: [lb]
+    depends_on: [server1]
     environment:
-      - SERVER_HOST=lb
-      - RPYC_PORT=9000
+      - SERVER_HOST=server1
+      - RPYC_PORT=18861
       - TWO_PASSES=1
       - SAVE_CSV=1
       - TIME_BETWEEN=0.1
       - INF_PASS=0
       - SAMPLE_SIZE=20
+      - JITTER=0
     volumes:
       - ./results:/results
     command: ["python", "client.py"]

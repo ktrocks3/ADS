@@ -1,16 +1,20 @@
 import ast, os, time, rpyc, csv, socket, random, datetime
 
 host = os.getenv("SERVER_HOST", "server")
-port = int(os.getenv("RPYC_PORT", "18861"))
+port = int(os.getenv("RPYC_PORT", "9000"))
 CLIENT_ID = os.getenv("CLIENT_ID") or socket.gethostname()  # unique per container
 print(f"{CLIENT_ID} has started")
+JITTER = bool(int(os.getenv("JITTER", "1")))
 START_JITTER = 10
-time.sleep(random.random() * START_JITTER)
+if JITTER:
+    time.sleep(random.random() * START_JITTER)
 CONNECT_EACH = True
 TWO_PASSES = bool(int(os.getenv("TWO_PASSES", "0")))
 INFINITE_REQUESTS = bool(int(os.getenv("INF_PASS", "0")))
 TIME_BETWEEN = float(os.getenv("TIME_BETWEEN", "3"))
 SAMPLE_SIZE = int(os.getenv("SAMPLE_SIZE", "5"))
+
+
 
 # Load random tests
 with open("word_list") as f:
@@ -19,7 +23,7 @@ tests = [ast.literal_eval(random.choice(options).strip()) for _ in range(SAMPLE_
 
 
 def sleep_with_jitter():
-    jitter = (random.random() - 0.5) * (TIME_BETWEEN * 0.2)
+    jitter = (random.random() - 0.5) * (TIME_BETWEEN * 0.2) if JITTER else 0
     time.sleep(max(0.0, TIME_BETWEEN + jitter))
 
 def run_batch(passno: int):
