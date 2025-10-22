@@ -47,8 +47,6 @@ def run_batch(passno: int):
                 )
                 rows.append([passno, CLIENT_ID, t_start, fname, kw,
                              resp['count'], resp['from_cache'], resp['server'], dt_ms])
-            except:
-                print("Connection was interrupted")
             finally:
                 conn.close()
     else:
@@ -68,31 +66,63 @@ def run_batch(passno: int):
                 )
                 rows.append([passno, CLIENT_ID, t_start, fname, kw,
                              resp['count'], resp['from_cache'], resp['server'], dt_ms])
-        except:
-            print("Connection was interrupted")
         finally:
             conn.close()
     return rows
 
 
 def infinite_requests():
-    while True:
-        sleep_with_jitter()
-        (fname, kw) = ast.literal_eval(random.choice(options).strip())
-        conn = rpyc.connect(host, port)
-        try:
+    os.makedirs("/results", exist_ok=True)
+    outfile = f"/results/latency-{CLIENT_ID}.csv"
+    with open(outfile, "a", newline="") as f:
+        w = csv.writer(f)
+        # Write header once
+        if f.tell() == 0:
+            w.writerow(["t_start_utc", "file", "keyword", "count", "from_cache", "server", "latency_ms"])
+
+        while True:
+            sleep_with_jitter()
+
+            fname, kw = ast.literal_eval(random.choice(options).strip())
+
+            # define timing and defaults BEFORE risky calls
+            t_start = datetime.datetime.utcnow().isoformat()
             t0 = time.perf_counter()
-            resp = conn.root.count(fname, kw)
-            dt_ms = (time.perf_counter() - t0) * 1000.0
-            print(
-                f"client={CLIENT_ID}, file={fname:6s} kw={kw:8s} count={resp['count']:5d} "
-                f"cache={resp['from_cache']} server={resp['server']}, latency={dt_ms:.2f}ms",
-                flush=True
-            )
-        except:
-            print("Connection was interrupted")
-        finally:
-            conn.close()
+            count = -1
+            from_cache = False
+            server = "-"
+            conn = None
+
+            try:
+                conn = rpyc.connect(host, port)  # may raise
+                resp = conn.root.count(fname, kw)  # may raise
+                count = int(resp.get("count", -1))
+                from_cache = bool(resp.get("from_cache", False))
+                server = str(resp.get("server", "-"))
+
+                dt_ms = (time.perf_counter() - t0) * 1000.0
+                print(
+                    f"client={CLIENT_ID}, file={fname:6s} kw={kw:8s} count={resp['count']:5d} "
+                    f"cache={resp['from_cache']} server={resp['server']}, latency={dt_ms:.2f}ms",
+                    flush=True
+                )
+
+            except Exception as e:
+                # still okay—t_start/t0 exist; we'll log below
+                print(f"Connection was interrupted: {e}", flush=True)
+
+            finally:
+                # close connection if it was opened
+                if conn is not None:
+                    try:
+                        conn.close()
+                    except Exception:
+                        pass
+
+                dt_ms = (time.perf_counter() - t0) * 1000.0
+                w.writerow([t_start, fname, kw, count, from_cache, server, f"{dt_ms:.2f}"])
+                f.flush()
+
 
 
 if INFINITE_REQUESTS:

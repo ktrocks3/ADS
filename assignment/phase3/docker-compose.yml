@@ -42,9 +42,9 @@ services:
       - SERVER_HOST=lb
       - RPYC_PORT=9000
       - TWO_PASSES=1
-      - SAVE_CSV=0
-      - TIME_BETWEEN=3
-      - INF_PASS=0
+      - SAVE_CSV=1
+      - TIME_BETWEEN=0.5
+      - INF_PASS=1
       - SAMPLE_SIZE=20
       - JITTER=0
     volumes:
