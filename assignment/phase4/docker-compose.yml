@@ -25,7 +25,7 @@ services:
     build: ./lb
     depends_on: [server1, server2, server3]
     environment:
-      - ALGO=rr
+      - ALGO=lc
       - LB_PORT=9000
       - EXTRA_INFO=0
       - REDIS_HOST=redis
@@ -43,8 +43,8 @@ services:
       - RPYC_PORT=9000
       - TWO_PASSES=1
       - SAVE_CSV=0
-      - TIME_BETWEEN=3
-      - INF_PASS=0
+      - TIME_BETWEEN=0.5
+      - INF_PASS=1
       - SAMPLE_SIZE=20
       - JITTER=0
     volumes:

@@ -9,10 +9,10 @@ health = {b[0]: True  for b in BACKENDS}
 fails  = {b[0]: 0     for b in BACKENDS}
 passes = {b[0]: 0     for b in BACKENDS}
 
-HC_INTERVAL = float(os.getenv("HC_INTERVAL", "2"))  # seconds between checks
-HC_TIMEOUT = float(os.getenv("HC_TIMEOUT", "1"))  # TCP dial timeout
+HC_INTERVAL = float(os.getenv("HC_INTERVAL", "0.5"))  # seconds between checks
+HC_TIMEOUT = float(os.getenv("HC_TIMEOUT", "0.2"))  # TCP dial timeout
 HC_FALL = int(os.getenv("HC_FALL", "2"))  # mark DOWN after N fails
-HC_RISE = int(os.getenv("HC_RISE", "2"))
+HC_RISE = int(os.getenv("HC_RISE", "1"))
 
 ALGO = os.getenv("ALGO", "rr").lower()  # 'rr' or 'lc'
 LISTEN_PORT = int(os.getenv("LB_PORT", "9000"))
@@ -91,20 +91,20 @@ async def proxy_client(reader, writer):
     while True:
         if EXTRA_INFO:
             print(f"[LB] New connection from client {writer.get_extra_info('peername')}")
-        idx = pool.pick()
-        host, port = pool.backends[idx]
-        if EXTRA_INFO:
-            print(f"[LB] Connecting client -> {host}:{port}")
 
+        idx = pool.pick()
         if idx is None or idx in tried:
             with contextlib.suppress(Exception):
-                # No one is healthy
                 writer.write(b"Service unavailable")
                 await writer.drain()
                 writer.close()
             return
 
         tried.add(idx)
+        host, port = pool.backends[idx]
+        if EXTRA_INFO:
+            print(f"[LB] Connecting client -> {host}:{port}")
+
         if not health[host]:
             continue
         try:
@@ -137,6 +137,7 @@ async def proxy_client(reader, writer):
 async def main():
     server = await asyncio.start_server(proxy_client, host="0.0.0.0", port=LISTEN_PORT)
     print(f"Load balancer with failure detection listening on :{LISTEN_PORT}  ALGO={ALGO}")
+    asyncio.create_task(health_loop())
     async with server:
         await server.serve_forever()
 
